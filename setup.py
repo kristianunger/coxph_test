@@ -4,7 +4,7 @@ setup(
     name='coxphtest',
     version='0.1',
     packages=find_packages(),
-    description='A wrapper function that allows serial generation of cox proportional hazard models and testing.',
+    description='A wrapper python function that allows serial generation of cox proportional hazard models and testing.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     author='Kristian Unger',
