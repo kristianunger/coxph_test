@@ -45,31 +45,15 @@ def coxph_test(data, tE, sE, covariates):
                 if (not data_cox.shape[0]==0):
                     dummie_df.index = data_cox.index
                 data_cox = pd.concat([data_cox, dummie_df], axis=1)
+    data_cox = pd.concat([data_cox, data_cox], axis=1)
     data_cox = data_cox.astype(int)
     data_cox.index = data.index
     data_EP = pd.concat([data[[tE, sE]], data_cox], axis=1)
     data_EP = data_EP.dropna()
-    cph_full = CoxPHFitter()
-    cph_full.fit(data_EP, duration_col=tE, event_col=sE)
-    log_likelihood_full = cph_full.log_likelihood_
-    # Fit a null model without covariates
-    cph_null = CoxPHFitter()
-    cph_null.fit(data_EP[[tE, sE]], tE, event_col=sE)
-    log_likelihood_null = cph_null.log_likelihood_
-    # Calculate the test statistic, which follows a chi-squared distribution
-    test_statistic = -2 * (log_likelihood_null - log_likelihood_full)
-    # Get the degrees of freedom, which is the difference in the number of parameters between the models
-    df = len(cph_full.params_) - len(cph_null.params_)
-    # Calculate the p-value
-    #p_value = chi2.sf(test_statistic, df)
-    data_lr = data[[tE,cv,sE]]
-    data_lr = data_lr.dropna()
-    if ((dtps=="float")|(dtps=="int")):
-        result_all_surv = multivariate_logrank_test(data[tE], float_dum,data[sE])
-    else:
-        testdat = pd.DataFrame({tE:data[tE], cv:data[cv],sE:data[sE]})
-        testdat = testdat.dropna()
-        result_all_surv = multivariate_logrank_test(testdat[tE], testdat[cv],testdat[sE])
+    data_EP['combined_group'] = data_EP.iloc[:, 2:data_EP.shape[1]].apply(lambda row: '_'.join(row.values.astype(str)), axis=1)
+
+    # Then use this in your multivariate_logrank_test
+    result_all_surv = multivariate_logrank_test(data_EP[tE], data_EP['combined_group'], data_EP[sE])
     p_value = result_all_surv._p_value[0]
 
     cph_summary = cph_full.summary[["exp(coef)", "exp(coef) lower 95%", "exp(coef) upper 95%", "p"]]
