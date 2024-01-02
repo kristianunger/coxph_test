@@ -46,7 +46,7 @@ def coxph_test(data, tE, sE, covariates):
                     dummie_df.index = data_cox.index
                 data_cox = pd.concat([data_cox, dummie_df], axis=1)
     data_cox = data_cox.astype(int)
-    #data_cox.index = data.index
+    data_cox.index = data.index
     data_EP = pd.concat([data[[tE, sE]], data_cox], axis=1)
     data_EP = data_EP.dropna()
     cph_full = CoxPHFitter()
