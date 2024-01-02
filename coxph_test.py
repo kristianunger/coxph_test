@@ -56,7 +56,7 @@ def coxph_test(data, tE, sE, covariates):
     # Create a combined categorical variable
     data_EP['combined_group'] = data_EP.iloc[:, 2:data_EP.shape[1]].apply(lambda row: '_'.join(row.values.astype(str)), axis=1)
     # Then use this in your multivariate_logrank_test
-    result = multivariate_logrank_test(data_EP[tE], data_EP['combined_group'], data_EP[sE])
+    result_all_surv = multivariate_logrank_test(data_EP[tE], data_EP['combined_group'], data_EP[sE])
 
     p_value = result_all_surv._p_value[0]
 
