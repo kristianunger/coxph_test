@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='coxph_test',
+    name='coxphtest',
     version='0.1',
     packages=find_packages(),
     description='A wrapper function that allows serial generation of cox proportional hazard models and testing.',
