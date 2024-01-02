@@ -50,10 +50,15 @@ def coxph_test(data, tE, sE, covariates):
     data_cox.index = data.index
     data_EP = pd.concat([data[[tE, sE]], data_cox], axis=1)
     data_EP = data_EP.dropna()
+    cph_full = CoxPHFitter()
+    cph_full.fit(data_EP, duration_col=tE, event_col=sE)
+    log_likelihood_full = cph_full.log_likelihood_
+    # Fit a null model without covariates
+    # Create a combined categorical variable
     data_EP['combined_group'] = data_EP.iloc[:, 2:data_EP.shape[1]].apply(lambda row: '_'.join(row.values.astype(str)), axis=1)
-
     # Then use this in your multivariate_logrank_test
-    result_all_surv = multivariate_logrank_test(data_EP[tE], data_EP['combined_group'], data_EP[sE])
+    result = multivariate_logrank_test(data_EP[tE], data_EP['combined_group'], data_EP[sE])
+
     p_value = result_all_surv._p_value[0]
 
     cph_summary = cph_full.summary[["exp(coef)", "exp(coef) lower 95%", "exp(coef) upper 95%", "p"]]
