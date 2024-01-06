@@ -1,4 +1,4 @@
-def coxph_test(data, tE, sE, covariates):
+def coxph_test(data, tE, sE, covariates, percentile):
     """
     Fit a Cox Proportional Hazards model and perform a multivariate log-rank test.
 
@@ -7,6 +7,7 @@ def coxph_test(data, tE, sE, covariates):
     - tE (str): The column name representing the time variable.
     - sE (str): The column name representing the event/censoring variable.
     - covariates (str array): covariates to be considered in multivariate testing
+    - percentile (int): 25, 50 or 75
     
     Returns:
     - cph_summary (pandas.DataFrame): Summary of the Cox Proportional Hazards model fit.
@@ -39,7 +40,8 @@ def coxph_test(data, tE, sE, covariates):
             data_cox = pd.concat([data_cox, dummie_df], axis=1)
         else:
             if ((dtps=="float")|(dtps=="int")):
-                cutoff = np.median(data_cv[cv])
+                
+                cutoff = np.percentile(data_cv[cv], percentile)
                 float_dum = np.repeat("low", data_cv.shape[0])
                 float_dum = np.where(data_cv[cv] > cutoff, "high", float_dum)
                 float_dum = pd.Series(float_dum).astype("category").cat.set_categories(["low","high"])
