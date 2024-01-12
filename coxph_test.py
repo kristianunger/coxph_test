@@ -1,4 +1,4 @@
-def coxph_test(data, tE, sE, covariates, percentile):
+def coxph_test_2(data, tE, sE, covariates, percentile):
     """
     Fit a Cox Proportional Hazards model and perform a multivariate log-rank test.
 
@@ -33,6 +33,9 @@ def coxph_test(data, tE, sE, covariates, percentile):
         dtps = data_cv[cv].dtype
         if dtps=="category":
             dummies = pd.get_dummies(data_cv[cv], prefix=cv, dtype=int, drop_first=True)
+            reflevel=data_cv[cv].cat.categories[0]
+            category_counts = data_cv[cv].value_counts().reindex(data_cv[cv].cat.categories)
+            category_counts = category_counts.tolist()
             dummies.sum(axis=0) < 2
             dummie_df = pd.DataFrame(dummies.loc[:,~(dummies.sum(axis=0) < 2)])
             if (not data_cox.shape[0]==0):
@@ -45,6 +48,8 @@ def coxph_test(data, tE, sE, covariates, percentile):
                 float_dum = np.repeat("low", data_cv.shape[0])
                 float_dum = np.where(data_cv[cv] > cutoff, "high", float_dum)
                 float_dum = pd.Series(float_dum).astype("category").cat.set_categories(["low","high"])
+                category_counts = [float_dum.value_counts()["low"],float_dum.value_counts()["high"]]
+                reflevel = "low"
                 dummies = pd.get_dummies(float_dum, prefix=cv, dtype=int, drop_first=True)
                 dummie_df = pd.DataFrame(dummies)
                 if (not data_cox.shape[0]==0):
@@ -98,7 +103,7 @@ def coxph_test(data, tE, sE, covariates, percentile):
     cph_summary["endpoint"][0] = tE
     new_row = pd.DataFrame({col: [""] for col in cph_summary.columns}, index=[0])
     cats = cph_summary.index.to_list()
-    cats.insert(0,"")
+    cats.insert(0,"reference: "+ str(reflevel))
     cph_summary = pd.concat([new_row, cph_summary]).reset_index(drop=True)
 
     cph_summary.insert(0, 'Variable(s)', "")
@@ -106,5 +111,6 @@ def coxph_test(data, tE, sE, covariates, percentile):
     cph_summary.insert(1, 'categories', cats)
     cph_summary.index = ['']*cph_summary.shape[0]
     cph_summary = cph_summary.rename(columns={cph_summary.columns[2]: "hazard ratio", cph_summary.columns[3]: "95%-CI low", cph_summary.columns[4]: "95%-CI high", cph_summary.columns[5]: "Wald test p"})
+    cph_summary.insert(2, 'n category', category_counts)
     pval_out = p_value#"{:.2e}".format(p_value)
     return cph_summary, pval_out
