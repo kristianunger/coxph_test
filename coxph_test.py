@@ -106,5 +106,5 @@ def coxph_test(data, tE, sE, covariates, percentile):
     cph_summary.insert(1, 'categories', cats)
     cph_summary.index = ['']*cph_summary.shape[0]
     cph_summary = cph_summary.rename(columns={cph_summary.columns[2]: "hazard ratio", cph_summary.columns[3]: "95%-CI low", cph_summary.columns[4]: "95%-CI high", cph_summary.columns[5]: "Wald test p"})
-    pval_out = "{:.2e}".format(p_value)
+    pval_out = p_value#"{:.2e}".format(p_value)
     return cph_summary, pval_out
