@@ -1,4 +1,4 @@
-def coxph_test(data, tE, sE, covariates, percentile):
+def coxph_test_2(data, tE, sE, covariates, percentile):
     """
     Fit a Cox Proportional Hazards model and perform a multivariate log-rank test.
 
@@ -78,8 +78,36 @@ def coxph_test(data, tE, sE, covariates, percentile):
     cph_summary = cph_full.summary[["exp(coef)", "exp(coef) lower 95%", "exp(coef) upper 95%", "p"]]
     cph_summary["Log rank p"] = np.repeat("", cph_summary.shape[0])
     cph_summary["Log rank p"][0] = p_value
+    cph_summary["significance"] = np.repeat("", cph_summary.shape[0])
+    
+    #significance stars
+    def get_sig_stars(p_value):
+        if p_value < 0.00005:
+            return "*****"
+        elif p_value < 0.0005:
+            return "****"
+        elif p_value < 0.005:
+            return "**"
+        elif p_value < 0.05:
+            return "*"
+        else:
+            return ""
+    
+    cph_summary["significance"][0] = get_sig_stars(p_value)
     cph_summary["endpoint"] = np.repeat("", cph_summary.shape[0])
     cph_summary["endpoint"][0] = tE
-    cph_summary = cph_summary.rename(columns={cph_summary.columns[0]: "hazard ratio", cph_summary.columns[1]: "95%-CI low", cph_summary.columns[2]: "95%-CI high", cph_summary.columns[3]: "Wald test p"})
+    new_row = pd.DataFrame({col: [""] for col in cph_summary.columns}, index=[0])
+    cats = cph_summary.index.to_list()
+    cats.insert(0,"")
+    cph_summary = pd.concat([new_row, cph_summary]).reset_index(drop=True)
+
+
+
+# Adding an empty column at the beginning
+    cph_summary.insert(0, 'Variable(s)', "")
+    cph_summary["Variable(s)"][0] = ", ".join(covariates)
+    cph_summary.insert(1, 'categories', cats)
+    cph_summary.index = ['']*cph_summary.shape[0]
+    cph_summary = cph_summary.rename(columns={cph_summary.columns[2]: "hazard ratio", cph_summary.columns[3]: "95%-CI low", cph_summary.columns[4]: "95%-CI high", cph_summary.columns[5]: "Wald test p"})
     pval_out = "{:.2e}".format(p_value)
     return cph_summary, pval_out
