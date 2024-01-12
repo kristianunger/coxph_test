@@ -132,4 +132,4 @@ def coxph_test(data, tE, sE, covariates, percentile):
         cph_summary["Variable(s)"] = covariates
         cph_summary.index = [""]
         pval_out = np.nan
-    return cph_summary, pval_outs
+    return cph_summary, pval_out
