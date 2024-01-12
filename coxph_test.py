@@ -101,9 +101,6 @@ def coxph_test_2(data, tE, sE, covariates, percentile):
     cats.insert(0,"")
     cph_summary = pd.concat([new_row, cph_summary]).reset_index(drop=True)
 
-
-
-# Adding an empty column at the beginning
     cph_summary.insert(0, 'Variable(s)', "")
     cph_summary["Variable(s)"][0] = ", ".join(covariates)
     cph_summary.insert(1, 'categories', cats)
