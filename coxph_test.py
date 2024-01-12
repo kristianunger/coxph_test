@@ -1,4 +1,4 @@
-def coxph_test_2(data, tE, sE, covariates, percentile):
+def coxph_test(data, tE, sE, covariates, percentile):
     """
     Fit a Cox Proportional Hazards model and perform a multivariate log-rank test.
 
