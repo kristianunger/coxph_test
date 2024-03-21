@@ -26,7 +26,7 @@ def coxph_test(data, tE, sE, covariates, percentile):
         covariates = [covariates]
 
     data = data[[tE,sE] + covariates]
-    data = data.dropna()
+    # data = data.dropna() 
     data_cox = pd.DataFrame()
     for cv in covariates:
         data_cv = data[~(pd.isna(data[cv]))]
@@ -64,8 +64,9 @@ def coxph_test(data, tE, sE, covariates, percentile):
                     dummie_df.index = data_cox.index
                 data_cox = pd.concat([data_cox, dummie_df], axis=1)
     data_cox = data_cox.astype(int)
+    data_cox = data_cox.dropna()
     if data_cox.shape[1]>0:
-        data_cox.index = data.index
+        #data_cox.index = data.index
         data_EP = pd.concat([data[[tE, sE]], data_cox], axis=1)
         data_EP = data_EP.dropna()
         cph_full = CoxPHFitter()
