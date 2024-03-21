@@ -26,7 +26,7 @@ def coxph_test(data, tE, sE, covariates, percentile):
         covariates = [covariates]
 
     data = data[[tE,sE] + covariates]
-    # data = data.dropna() 
+# data = data.dropna() 
     data_cox = pd.DataFrame()
     for cv in covariates:
         data_cv = data[~(pd.isna(data[cv]))]
